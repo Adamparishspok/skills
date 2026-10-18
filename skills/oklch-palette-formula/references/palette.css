@@ -1,0 +1,95 @@
+/* Neutral palette from a few OKLCH inputs. Starter values: a cool grey,
+ * white paper, near-black ink. Tune with scripts/fit_palette.py, check with
+ * scripts/palette-audit.mjs.
+ *
+ * Scope: declare on the element that carries your theme attribute (here
+ * :root with [data-theme="dark"]). If your theme lives on an app root
+ * instead, use that selector for both rules. The colours must be declared on
+ * that same element, not on an ancestor: a var() inside a custom property
+ * resolves where it is declared, so colours declared on :root would never
+ * see inputs changed on a child. They are repeated in the dark rule only so
+ * it outranks any hard-coded dark values left elsewhere; once none remain,
+ * the dark rule needs only its inputs.
+ *
+ * Tailwind v4: keep `--color-ground` etc. in @theme too (any value) so the
+ * utilities exist; these declarations override the values at runtime. */
+
+:root {
+  --hue: 282;
+  --tint: 0;
+  --paper: 1;
+  --depth: 0.0255;
+  --ink-l: 0.2465;
+  --ink-step: 0.11;
+  --ink-tint: 0.0175;
+
+  --n-ground: -1;
+  --n-panel: -1;
+  --n-surface: 0;
+  --n-surface-2: -1.25;
+  --n-surface-3: -2;
+  --n-field: -2.5;
+  --n-line: -2.6;
+  --n-line-2: -3.9;
+  --n-line-3: -4.6;
+  --n-field-line: -15;
+  --n-ink: 0;
+  --n-ink-2: 1;
+  --n-ink-3: 2.3;
+  --n-ink-4: 2.7;
+
+  --color-ground: oklch(calc(var(--paper) + var(--depth) * var(--n-ground)) var(--tint) var(--hue));
+  --color-panel: oklch(calc(var(--paper) + var(--depth) * var(--n-panel)) var(--tint) var(--hue));
+  --color-surface: oklch(calc(var(--paper) + var(--depth) * var(--n-surface)) var(--tint) var(--hue));
+  --color-surface-2: oklch(calc(var(--paper) + var(--depth) * var(--n-surface-2)) var(--tint) var(--hue));
+  --color-surface-3: oklch(calc(var(--paper) + var(--depth) * var(--n-surface-3)) var(--tint) var(--hue));
+  --color-field: oklch(calc(var(--paper) + var(--depth) * var(--n-field)) var(--tint) var(--hue));
+  --color-line: oklch(calc(var(--paper) + var(--depth) * var(--n-line)) var(--tint) var(--hue));
+  --color-line-2: oklch(calc(var(--paper) + var(--depth) * var(--n-line-2)) var(--tint) var(--hue));
+  --color-line-3: oklch(calc(var(--paper) + var(--depth) * var(--n-line-3)) var(--tint) var(--hue));
+  --color-field-line: oklch(calc(var(--paper) + var(--depth) * var(--n-field-line)) var(--tint) var(--hue));
+  --color-ink: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink)) var(--ink-tint) var(--hue));
+  --color-ink-2: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink-2)) var(--ink-tint) var(--hue));
+  --color-ink-3: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink-3)) var(--ink-tint) var(--hue));
+  --color-ink-4: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink-4)) var(--ink-tint) var(--hue));
+}
+
+:root[data-theme="dark"] {
+  --hue: 294;
+  --tint: 0.013;
+  --paper: 0.2335;
+  --depth: 0.041;
+  --ink-l: 0.962;
+  --ink-step: 0.107;
+  --ink-tint: 0.019;
+
+  --n-ground: -1;
+  --n-panel: -0.6;
+  --n-surface: 0;
+  --n-surface-2: -1.2;
+  --n-surface-3: 1;
+  --n-field: 1;
+  --n-line: 1.2;
+  --n-line-2: 2.2;
+  --n-line-3: 3.3;
+  --n-field-line: 8.5;
+  --n-ink: 0;
+  --n-ink-2: -1;
+  --n-ink-3: -2.5;
+  --n-ink-4: -3.1;
+
+  --color-ground: oklch(calc(var(--paper) + var(--depth) * var(--n-ground)) var(--tint) var(--hue));
+  --color-panel: oklch(calc(var(--paper) + var(--depth) * var(--n-panel)) var(--tint) var(--hue));
+  --color-surface: oklch(calc(var(--paper) + var(--depth) * var(--n-surface)) var(--tint) var(--hue));
+  --color-surface-2: oklch(calc(var(--paper) + var(--depth) * var(--n-surface-2)) var(--tint) var(--hue));
+  --color-surface-3: oklch(calc(var(--paper) + var(--depth) * var(--n-surface-3)) var(--tint) var(--hue));
+  --color-field: oklch(calc(var(--paper) + var(--depth) * var(--n-field)) var(--tint) var(--hue));
+  --color-line: oklch(calc(var(--paper) + var(--depth) * var(--n-line)) var(--tint) var(--hue));
+  --color-line-2: oklch(calc(var(--paper) + var(--depth) * var(--n-line-2)) var(--tint) var(--hue));
+  --color-line-3: oklch(calc(var(--paper) + var(--depth) * var(--n-line-3)) var(--tint) var(--hue));
+  --color-field-line: oklch(calc(var(--paper) + var(--depth) * var(--n-field-line)) var(--tint) var(--hue));
+  --color-ink: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink)) var(--ink-tint) var(--hue));
+  --color-ink-2: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink-2)) var(--ink-tint) var(--hue));
+  --color-ink-3: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink-3)) var(--ink-tint) var(--hue));
+  --color-ink-4: oklch(calc(var(--ink-l) + var(--ink-step) * var(--n-ink-4)) var(--ink-tint) var(--hue));
+}

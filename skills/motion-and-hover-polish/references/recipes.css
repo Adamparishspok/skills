@@ -1,0 +1,209 @@
+/* Motion tiers and the hover recipes built on them.
+ *
+ * Durations are a scale, not a number picked per component: the eye reads a
+ * shared tempo as one product. Smaller things move faster.
+ *
+ *   tap     100ms  an icon swapping, a press
+ *   pop     150ms  a menu, popover or tooltip opening
+ *   hover   200ms  a row or control answering the pointer
+ *   card    300ms  a card lifting, an image settling
+ *   layout  500ms  a panel collapsing, the page reflowing
+ *
+ * Exits are shorter and ease in; entrances ease out. Where two things trade
+ * places (an icon swap, a label roll) the outgoing one leaves at once and the
+ * incoming one starts after `--delay-handoff`, so they never overlap at full
+ * opacity.
+ *
+ * The recipes are utilities, not components: they are unlayered like every
+ * other utility here, and their hover rules out-specify a plain `shadow-*` or
+ * `bg-*` on the same element. */
+@theme {
+  /* Easings. Entrances ease out; exits ease in. */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --duration-tap: 100ms;
+  --duration-pop: 150ms;
+  --duration-hover: 200ms;
+  --duration-card: 300ms;
+  --duration-layout: 500ms;
+  --delay-handoff: 50ms;
+
+}
+
+/* Sets `--tw-duration` as well, like Tailwind's own `duration-*`: a
+   `transition-[…]` utility on the same element reads the variable, so setting
+   only the property would lose to it whenever it sorts later. */
+@utility duration-* {
+  --tw-duration: --value(--duration-*);
+  transition-duration: --value(--duration-*);
+}
+
+@utility delay-handoff {
+  --tw-delay: var(--delay-handoff);
+  transition-delay: var(--delay-handoff);
+}
+
+/* A row whose highlight grows into place: it starts a few pixels inside the
+   row, transparent, and swells to the full row as it fades in. Reads as the
+   row answering the pointer rather than a rectangle switching on.
+   The fill is `--hover-fill` (default surface-3). */
+@utility hover-grow {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0.1875rem 0.375rem;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--hover-fill, var(--color-surface-3, rgb(0 0 0 / 0.05)));
+    opacity: 0;
+    transition:
+      inset var(--duration-hover) var(--ease-out-quint),
+      opacity var(--duration-hover) var(--ease-out-quint);
+    pointer-events: none;
+  }
+  &:focus-visible::before,
+  &[data-state="open"]::before,
+  &[aria-current="page"]::before {
+    inset: 0;
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    &:hover::before {
+      inset: 0;
+      opacity: 1;
+    }
+  }
+}
+
+/* A trailing glyph that only arrives on hover or focus: half size and
+   transparent at rest, full on the row's `group` hover. Grows from its leading
+   edge, so an arrow reads as pointing somewhere. `trail-out` grows from the
+   bottom-left corner instead, for links that leave the app (arrow-up-right). */
+@utility trail {
+  transform-origin: left center;
+  scale: 0.5;
+  opacity: 0;
+  transition:
+    scale var(--duration-hover) var(--ease-out-quint),
+    opacity var(--duration-hover) var(--ease-out-quint);
+  :where(.group:focus-visible, .group[data-state="open"]) & {
+    scale: 1;
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    :where(.group:hover) & {
+      scale: 1;
+      opacity: 1;
+    }
+  }
+}
+
+@utility trail-out {
+  transform-origin: left bottom;
+}
+
+/* A chevron that leans toward where it goes. */
+/* The same lean, backwards: for a back arrow or a chevron pointing left. */
+@utility nudge-back {
+  transition: translate var(--duration-hover) var(--ease-out-quint);
+  :where(.group:focus-visible) & {
+    translate: -0.125rem 0;
+  }
+  @media (hover: hover) {
+    :where(.group:hover) & {
+      translate: -0.125rem 0;
+    }
+  }
+}
+
+@utility nudge {
+  transition: translate var(--duration-hover) var(--ease-out-quint);
+  :where(.group:focus-visible) & {
+    translate: 0.125rem 0;
+  }
+  @media (hover: hover) {
+    :where(.group:hover) & {
+      translate: 0.125rem 0;
+    }
+  }
+}
+
+/* A card that rises a step on hover: one surface step lighter, one shadow
+   step deeper. Both are inputs (`--lift-fill`, `--lift-shadow`) so an app
+   names its own next step. No translate: a card that jumps under the cursor
+   moves the thing being aimed at. */
+@utility lift {
+  transition:
+    background-color var(--duration-card) var(--ease-out-quint),
+    box-shadow var(--duration-card) var(--ease-out-quint);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--lift-fill, var(--color-surface, #fff));
+      box-shadow: var(--lift-shadow, var(--shadow-3, 0 2px 4px -1px rgb(0 0 0 / 0.07), 0 10px 24px -6px rgb(0 0 0 / 0.12)));
+    }
+  }
+}
+
+/* Edge fades on a scroll container, only on a side that can still scroll.
+   A mask rather than a gradient overlay, so it works on any ground without
+   naming the ground's colour. Driven by the container's own scroll timeline:
+   where scroll-driven animation is unsupported the fades simply do not
+   appear.
+   Not on an element that animates itself (a Radix menu, popover or select
+   content with `pop-anim`): this sets `animation`, which replaces the
+   element's own exit animation, and Radix then waits for an exit that never
+   ends and the menu stays open. Put it on a scrolling child inside instead. */
+@property --fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes kit-scroll-fade {
+  0% {
+    --fade-start: 0px;
+    --fade-end: var(--fade-size, 1.5rem);
+  }
+  8%,
+  92% {
+    --fade-start: var(--fade-size, 1.5rem);
+    --fade-end: var(--fade-size, 1.5rem);
+  }
+  100% {
+    --fade-start: var(--fade-size, 1.5rem);
+    --fade-end: 0px;
+  }
+}
+@utility scroll-fade {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent
+  );
+  @supports (animation-timeline: scroll()) {
+    animation: kit-scroll-fade linear both;
+    animation-timeline: scroll(self block);
+  }
+}
+@utility scroll-fade-x {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent
+  );
+  @supports (animation-timeline: scroll()) {
+    animation: kit-scroll-fade linear both;
+    animation-timeline: scroll(self inline);
+  }
+}

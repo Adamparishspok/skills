@@ -1,0 +1,4 @@
+{"light": {"surface":0,"panel":-1,"ground":-1,"surface-2":-1.25,"surface-3":-2,"field":-2.5,"line":-2.6,"line-2":-3.9,"line-3":-4.6,"field-line":-15,
+           "ink":0,"ink-2":1,"ink-3":2.3,"ink-4":2.7},
+ "dark":  {"surface":0,"panel":-0.6,"ground":-1,"surface-2":-1.2,"surface-3":1,"field":1,"line":1.2,"line-2":2.2,"line-3":3.3,"field-line":8.5,
+           "ink":0,"ink-2":-1,"ink-3":-2.5,"ink-4":-3.1}}

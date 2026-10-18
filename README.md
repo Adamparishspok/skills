@@ -1,0 +1,33 @@
+# Design skills
+
+Agent skills for design engineering, written by Adam Parish and drawn from
+real migrations: 17 prototype apps moved onto one shared component library,
+one palette formula, one motion tempo and a contrast audit, without losing
+any app's look.
+
+Each skill is a folder with a `SKILL.md` (frontmatter `name` + `description`,
+then the method) plus the reference code and scripts it uses. They work with
+Claude Code, Cursor, Codex and any agent that reads `SKILL.md` folders.
+
+| Skill | What it does |
+| ----- | ------------ |
+| [`oklch-palette-formula`](skills/oklch-palette-formula/SKILL.md) | Neutrals from a few OKLCH inputs and a ladder per theme. A fit script reproduces an existing palette within ΔE 2, and a browser audit enforces WCAG floors. |
+| [`motion-and-hover-polish`](skills/motion-and-hover-polish/SKILL.md) | One duration scale (tap/pop/hover/card/layout), plus hover recipes: grow-in rows, trailing arrows, nudges, lifts, scroll fades, icon and label swaps. |
+| [`multi-app-design-system`](skills/multi-app-design-system/SKILL.md) | Consolidate many apps onto token-sized shared components. Covers variant mapping, what stays app-specific, and the tailwind-merge traps. |
+| [`visual-regression-pass`](skills/visual-regression-pass/SKILL.md) | Before/after screenshots across many apps in parallel, ranked diffs, and triage of noise vs real regressions. |
+
+## Install
+
+Claude Code (user-wide):
+
+```
+git clone <this repo> ~/design-skills
+ln -s ~/design-skills/skills/* ~/.claude/skills/
+```
+
+Per project: copy a skill folder into `.claude/skills/` (Claude Code) or
+`.cursor/skills/` (Cursor).
+
+## License
+
+MIT licensed.
