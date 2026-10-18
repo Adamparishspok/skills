@@ -15,13 +15,15 @@ Claude Code, Cursor, Codex and any agent that reads `SKILL.md` folders.
 | [`motion-and-hover-polish`](skills/motion-and-hover-polish/SKILL.md) | One duration scale (tap/pop/hover/card/layout), plus hover recipes: grow-in rows, trailing arrows, nudges, lifts, scroll fades, icon and label swaps. |
 | [`multi-app-design-system`](skills/multi-app-design-system/SKILL.md) | Consolidate many apps onto token-sized shared components. Covers variant mapping, what stays app-specific, and the tailwind-merge traps. |
 | [`visual-regression-pass`](skills/visual-regression-pass/SKILL.md) | Before/after screenshots across many apps in parallel, ranked diffs, and triage of noise vs real regressions. |
+| [`favicon-setup`](skills/favicon-setup/SKILL.md) | The lean five-file favicon set, head markup added once per framework, dark-mode SVG, maskable manifest icons, cache busting and verification. |
+| [`safari-edge-colors`](skills/safari-edge-colors/SKILL.md) | Match iOS Safari's status bar and toolbar to the page's top and bottom edges with fixed edge strips, including scroll-driven colors. |
 
 ## Install
 
 Claude Code (user-wide):
 
 ```
-git clone <this repo> ~/design-skills
+git clone https://github.com/Adamparishspok/design-skills.git ~/design-skills
 ln -s ~/design-skills/skills/* ~/.claude/skills/
 ```
 
