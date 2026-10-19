@@ -1,6 +1,6 @@
 /* Neutral palette from a few OKLCH inputs. Starter values: a cool grey,
  * white paper, near-black ink. Tune with scripts/fit_palette.py, check with
- * scripts/palette-audit.mjs.
+ * scripts/palette-audit.js.
  *
  * Scope: declare on the element that carries your theme attribute (here
  * :root with [data-theme="dark"]). If your theme lives on an app root

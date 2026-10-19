@@ -8,14 +8,14 @@ import { focusRing } from "../lib/focus";
  * One button for every app on the kit. What differs between apps is
  * measurement, not markup, so the measurements are theme tokens: each size
  * reads its height and side padding from `--spacing-btn-<size>` and
- * `--spacing-btn-px-<size>` (base.css). The kit's defaults are the
- * comps, 36px on a 6px radius; a suite of apps sets its own in its theme file.
+ * `--spacing-btn-px-<size>` (base.css). The kit's defaults are 36px on a 6px
+ * radius; a suite of apps sets its own in its theme file.
  * An icon button is a square of the same height.
  *
  * `accent` is the high-commitment action. It paints `bg-accent` and adds
  * `.accent-fill`, which an app's theme turns into either a gradient over the
- * fill (for example a two-stop near-black) or a sheen on top of it (the suite's
- * navy) — so it is never transparent in a theme that only defines one.
+ * fill (for example a two-stop near-black) or a sheen on top of it (for example
+ * over a navy) — so it is never transparent in a theme that only defines one.
  */
 const button = cva(
   cn(

@@ -19,6 +19,7 @@ Two ideas, proven across 17 prototype apps:
 - `references/recipes.css`: Tailwind v4 `@theme` tokens and `@utility` recipes.
 - `references/timing.ts`: the same tiers for Motion and WAAPI.
 - `references/swap.tsx`: `IconSwap` and `LabelSwap` (React).
+- `references/cn.ts`: the `cn()` helper `swap.tsx` imports (needs `clsx` and `tailwind-merge`).
 
 ## Tiers
 

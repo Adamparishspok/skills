@@ -21,15 +21,16 @@ Move an input and the whole ramp moves together, so the gaps between steps,
 which is where contrast lives, survive a retint. Retinting a product is one
 line (`--hue`).
 
-Three knobs (`--hue`, `--lightness`, `--chroma` or `--contrast`) drive every
-colour.
+Seven inputs per theme drive every colour: `--hue` for all of them; `--paper`,
+`--depth` and `--tint` for grounds and lines; `--ink-l`, `--ink-step` and
+`--ink-tint` for text.
 
 ## Files
 
 - `references/palette.css`: drop-in rules with starter inputs and ladders.
 - `scripts/fit_palette.py`: fit inputs to an existing hex palette and print ΔE per token.
 - `scripts/ladders.json`: the default ladders (light, dark).
-- `scripts/palette-audit.mjs`: resolve every token in a real browser in both themes and fail on contrast.
+- `scripts/palette-audit.js`: resolve every token in a real browser in both themes and fail on contrast.
 - `scripts/oklch.py`: conversions and ΔE / WCAG helpers.
 
 ## Procedure
@@ -55,7 +56,7 @@ colour.
      the kit's defaults otherwise wins with *its* values.
    - With Tailwind v4, keep the token names in `@theme` so the utilities
      exist; the runtime declarations override them.
-5. **Audit in a real browser:** `node scripts/palette-audit.mjs <url>`. It
+5. **Audit in a real browser:** `node scripts/palette-audit.js <url>`. It
    paints each token, reads back sRGB, and checks:
    - every ink step at 4.5:1 against every ground;
    - `field-line` and `ring` at 3:1.

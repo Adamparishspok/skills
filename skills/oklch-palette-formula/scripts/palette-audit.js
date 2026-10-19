@@ -2,9 +2,9 @@
  * Palette audit: resolves an app's colour tokens in a real browser, in both
  * themes, and checks WCAG contrast floors for text and control edges.
  *
- *   node palette-audit.mjs http://localhost:5173/                 audit
- *   node palette-audit.mjs http://localhost:5173/ --print         and list tokens
- *   node palette-audit.mjs <url> --root "#app" --attr data-theme  theme on #app
+ *   node palette-audit.js http://localhost:5173/                 audit
+ *   node palette-audit.js http://localhost:5173/ --print         and list tokens
+ *   node palette-audit.js <url> --root "#app" --attr data-theme  theme on #app
  *
  * The theme is switched by setting <attr>="light"|"dark" on the root element
  * (default: the <html> element and data-theme). Requires `playwright` and a
@@ -27,7 +27,7 @@ const arg = (name, fallback) => {
 const rootSel = arg("--root", "html");
 const attr = arg("--attr", "data-theme");
 if (!url) {
-  console.error("usage: node palette-audit.mjs <url> [--print] [--root <selector>] [--attr <name>]");
+  console.error("usage: node palette-audit.js <url> [--print] [--root <selector>] [--attr <name>]");
   process.exit(2);
 }
 

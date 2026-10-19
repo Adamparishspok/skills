@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "./cn"; // clsx + tailwind-merge; see multi-app-design-system/references/cn.ts
+import { cn } from "./cn"; // clsx + tailwind-merge, taught the kit's tokens
 
 /**
  * Two glyphs that trade places: a menu that becomes a close, a copy icon that
