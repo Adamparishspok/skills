@@ -1,0 +1,16 @@
+# For a deployed web app or API only. Scan only targets you own; start with staging.
+name: DAST
+on:
+  schedule: [{ cron: '0 9 * * 1' }]  # Mondays 09:00 UTC
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: zaproxy/action-baseline@<sha> # vX.Y.Z
+        with:
+          target: https://your-app.example.com
+          allow_issue_writing: false

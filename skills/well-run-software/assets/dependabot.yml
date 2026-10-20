@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: <ecosystem>    # npm, pip, uv, gomod, cargo, maven, gradle, bundler, composer, docker...
+    directory: /
+    schedule: { interval: weekly }
+    cooldown: { default-days: 7 }     # don't adopt brand-new releases instantly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions # keeps SHA-pinned actions current
+    directory: /
+    schedule: { interval: weekly }
+    cooldown: { default-days: 7 }
+    groups:
+      actions:
+        patterns: ["*"]

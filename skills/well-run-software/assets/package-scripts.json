@@ -1,0 +1,13 @@
+{
+  "//": "Merge into package.json. Then: npm i -D husky lint-staged prettier eslint @commitlint/cli @commitlint/config-conventional && npx husky init",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs,svelte,vue}": ["prettier --write", "eslint --fix --max-warnings=0"],
+    "*.{json,md,css,scss,html,yml,yaml}": "prettier --write"
+  }
+}

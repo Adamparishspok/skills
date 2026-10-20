@@ -17,6 +17,7 @@ Claude Code, Cursor, Codex and any agent that reads `SKILL.md` folders.
 | [`visual-regression-pass`](skills/visual-regression-pass/SKILL.md) | Before/after screenshots across many apps in parallel, ranked diffs, and triage of noise vs real regressions. |
 | [`favicon-setup`](skills/favicon-setup/SKILL.md) | The lean five-file favicon set, head markup added once per framework, dark-mode SVG, maskable manifest icons, cache busting and verification. |
 | [`agent-ready-site`](skills/agent-ready-site/SKILL.md) | Make a site, app or store ready for AI agents. Scans with Cloudflare's Agent Readiness checks and sorts out which apply. Ships robots/Content Signals, Markdown for Agents, Link headers, API catalog and OAuth discovery, plus JSON-LD and llms.txt. |
+| [`well-run-software`](skills/well-run-software/SKILL.md) | Audit or set up the practices that keep software shipping safely: rulesets, PR template, CI with SHA-pinned actions, pre-commit hooks, Prettier/Biome and strict ESLint, Conventional Commits, ticket-linked PRs, Dependabot, secrets and incident basics. A read-only script scores any repo. |
 | [`safari-edge-colors`](skills/safari-edge-colors/SKILL.md) | Match iOS Safari's status bar and toolbar to the page's top and bottom edges with fixed edge strips, including scroll-driven colors. |
 
 ## Honorable mentions

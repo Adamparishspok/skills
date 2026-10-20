@@ -1,0 +1,6 @@
+# Later lines win. Owners are requested for review automatically.
+# Turn on "Require review from Code Owners" in the ruleset to make it binding.
+*                     @your-org/maintainers
+/.github/             @your-org/maintainers
+/src/auth/            @security-minded-person
+/migrations/          @db-owner

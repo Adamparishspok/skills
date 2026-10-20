@@ -1,0 +1,56 @@
+# Replace every <sha> with the real commit SHA for the tag in the comment:
+#   gh api repos/actions/checkout/commits/v4.2.2 --jq .sha
+# Replace every <...> command with the project's own. Examples per stack:
+#   setup:  actions/setup-node | setup-python | setup-go | setup-java | dtolnay/rust-toolchain
+#   install from lockfile:  npm ci | uv sync --locked | go mod download | cargo fetch --locked
+#   format check:           npm run format:check (prettier --check .) | ruff format --check | test -z "$(gofmt -l .)" | cargo fmt --check
+#   dependency audit:       npm audit --audit-level=high | pip-audit | govulncheck ./... | cargo audit
+# Drop a step only if the tool truly does not apply.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@<sha> # vX.Y.Z
+        with: { persist-credentials: false }
+      - uses: <setup-action>@<sha> # vX.Y.Z
+      - run: <install from lockfile>
+      - run: <format check>
+      - run: <lint>
+      - run: <typecheck>
+      - run: <test>
+      - run: <build>
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@<sha> # vX.Y.Z
+        with: { persist-credentials: false }
+      - uses: <setup-action>@<sha> # vX.Y.Z
+      - run: <dependency audit>
+  semgrep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Pin by digest for full reproducibility: semgrep/semgrep@sha256:<digest>
+    container: { image: semgrep/semgrep }
+    steps:
+      - uses: actions/checkout@<sha> # vX.Y.Z
+        with: { persist-credentials: false }
+      - run: semgrep scan --config p/default --config p/secrets --error
+  workflows:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@<sha> # vX.Y.Z
+        with: { persist-credentials: false }
+      - run: pipx run zizmor --format=github .github/workflows
