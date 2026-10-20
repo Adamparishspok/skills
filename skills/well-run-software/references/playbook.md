@@ -92,7 +92,7 @@ gh api repos/{owner}/{repo}/branches/main/protection  # classic protection, 404 
 - Review within one working day. Slow reviews kill momentum.
 - Comment on the code, not the person. Prefix optional feedback with `nit:`.
 - The author owns the merge. The reviewer's approval means "I'd be comfortable supporting this."
-- Use a `CODEOWNERS` file so the right people are requested automatically (see `assets/CODEOWNERS`). Turn on "Require review from Code Owners" for paths that matter, such as auth.
+- Use a `CODEOWNERS` file so the right people are requested automatically (see `assets/CODEOWNERS.txt`). Turn on "Require review from Code Owners" for paths that matter, such as auth.
 
 ---
 
@@ -101,7 +101,7 @@ gh api repos/{owner}/{repo}/branches/main/protection  # classic protection, 404 
 Formatting is not a review topic. A machine decides, and humans never argue about it again.
 
 - **One formatter, zero options debated.** Prettier for web stacks, or Biome for one fast tool that formats and lints. Ruff format for Python, `gofmt` for Go, `rustfmt` for Rust. Accept the defaults.
-- Add an `.editorconfig` (`assets/editorconfig`) so every editor agrees on line endings, final newline and indentation before the formatter runs.
+- Add an `.editorconfig` (`assets/editorconfig.ini`) so every editor agrees on line endings, final newline and indentation before the formatter runs.
 - **Lint strict, as errors.** Warnings pile up and get ignored. Run the linter with zero warnings allowed (`--max-warnings=0`). For TypeScript use `typescript-eslint` `strict` (not just `recommended`), and make `no-explicit-any` and `no-unused-vars` errors. See `assets/eslint.config.js`, or `assets/biome.json` for Biome.
 - Keep the formatter and linter from fighting: `eslint-config-prettier` turns off ESLint's style rules, and Prettier owns formatting.
 - **Relax a rule only where it is wrong, by file pattern, with a comment saying why.** For example, non-null assertions in test files, or in Svelte/Vue templates where type narrowing from a template condition does not carry into the expression below it. Never turn a rule off for the whole project to silence one file.

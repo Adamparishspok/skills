@@ -35,7 +35,7 @@ One idea behind everything here: **make the right thing the easy thing, and the 
    4. Supply chain gaps: unpinned actions, no lockfile, no dependency updates
    5. Missing tests on security boundaries
    6. Everything else
-4. For each finding give: what is wrong, why it matters (one line), the exact fix. End with the 8-question self-audit from the playbook, answered for this repo where you can tell.
+4. For each finding give: what is wrong, why it matters (one line), the exact fix. End with the 9-question self-audit from the playbook, answered for this repo where you can tell.
 
 Do not change anything in Audit mode unless the user asks.
 
@@ -46,14 +46,14 @@ Work through the **Day one** checklist in `references/playbook.md`. Copy templat
 | File | Goes to |
 |---|---|
 | `assets/pull_request_template.md` | `.github/pull_request_template.md` |
-| `assets/CODEOWNERS` | `.github/CODEOWNERS` |
+| `assets/CODEOWNERS.txt` | `.github/CODEOWNERS` |
 | `assets/ci.yml` | `.github/workflows/ci.yml` |
 | `assets/commitlint.yml` + `assets/commitlint.config.js` | `.github/workflows/commitlint.yml` + `commitlint.config.js` |
 | `assets/ticket-link.yml` | `.github/workflows/ticket-link.yml` (set `TICKET_PATTERN` for the tracker) |
-| `assets/editorconfig` | `.editorconfig` |
+| `assets/editorconfig.ini` | `.editorconfig` |
 | `assets/eslint.config.js` | `eslint.config.js` (TypeScript projects; or `assets/biome.json` as `biome.json` to replace Prettier + ESLint) |
 | `assets/package-scripts.json` | merge into `package.json` (scripts + lint-staged), then `npx husky init` |
-| `assets/husky/pre-commit`, `assets/husky/commit-msg` | `.husky/` (Node; use lefthook or `pre-commit` for other stacks) |
+| `assets/husky/pre-commit.sh`, `assets/husky/commit-msg.sh` | `.husky/pre-commit` and `.husky/commit-msg`, no extension (Node; use lefthook or `pre-commit` for other stacks) |
 | `assets/dependabot.yml` | `.github/dependabot.yml` |
 | `assets/dast.yml` | `.github/workflows/dast.yml` (only for a deployed web app or API) |
 
