@@ -93,23 +93,34 @@ fi
 echo "== Formatting, linting and hooks"
 fmt=$(first .prettierrc .prettierrc.json .prettierrc.js .prettierrc.cjs .prettierrc.mjs .prettierrc.yaml .prettierrc.yml prettier.config.js prettier.config.mjs prettier.config.cjs biome.json biome.jsonc .rustfmt.toml rustfmt.toml)
 if [ -z "$fmt" ] && [ -f package.json ] && grep -q '"prettier"' package.json; then fmt=package.json; fi
+vpcfg=$(first vite.config.ts vite.config.mts vite.config.js vite.config.mjs)
+if [ -z "$fmt" ] && [ -n "$vpcfg" ] && grep -q "vite-plus" "$vpcfg"; then fmt="$vpcfg (Vite+)"; fi
 if [ -z "$fmt" ] && [ -f pyproject.toml ] && grep -qE '^\[tool\.(ruff|black)' pyproject.toml; then fmt=pyproject.toml; fi
 [ -n "$fmt" ] || [ -f go.mod ] && pass "Formatter configured (${fmt:-gofmt})" || warn "No formatter config (Prettier, Biome, Ruff...)"
 [ -f .editorconfig ] && pass ".editorconfig" || warn "No .editorconfig"
 if [ -n "$wfs" ]; then
-  grep -qE 'format:check|prettier --check|biome (ci|check)|ruff format --check|gofmt|cargo fmt|black --check' $wfs && pass "Format check in CI" || warn "CI does not check formatting"
+  grep -qE 'format:check|prettier --check|vp check|biome (ci|check)|ruff format --check|gofmt|cargo fmt|black --check' $wfs && pass "Format check in CI" || warn "CI does not check formatting"
   grep -qiE 'commitlint' $wfs && pass "Commit messages checked in CI" || warn "No commitlint (Conventional Commits) in CI"
 fi
-hooks=$(first .husky/pre-commit lefthook.yml lefthook.yaml .lefthook.yml .pre-commit-config.yaml)
+hooks=$(first .vite-hooks/pre-commit .husky/pre-commit lefthook.yml lefthook.yaml .lefthook.yml .pre-commit-config.yaml)
 if [ -n "$hooks" ]; then
   pass "Pre-commit hooks ($hooks)"
   grep -qE 'main|master' "$hooks" || warn "Pre-commit hook does not block commits on main"
 else
-  warn "No pre-commit hooks (husky, lefthook, pre-commit)"
+  warn "No pre-commit hooks (Vite+, husky, lefthook, pre-commit)"
+fi
+global_hooks=$(git config --global core.hooksPath 2>/dev/null || true)
+[ -n "$global_hooks" ] && [ "$(git config core.hooksPath)" = "$global_hooks" ] && warn "Global core.hooksPath ($global_hooks) overrides this repo's hooks"
+if [ -n "$vpcfg" ] && grep -q "vite-plus" "$vpcfg"; then
+  grep -qE 'typeAware:\s*true' "$vpcfg" || warn "Vite+ lint is not type-aware (lint.options.typeAware)"
 fi
 if [ -f eslint.config.js ] || [ -f eslint.config.mjs ] || [ -f eslint.config.ts ]; then
   cfg=$(first eslint.config.js eslint.config.mjs eslint.config.ts)
-  grep -qE 'configs\.(strict|strictTypeChecked)' "$cfg" || warn "ESLint not on typescript-eslint strict ($cfg)"
+  grep -qE 'configs\.strictTypeChecked' "$cfg" || warn "ESLint not on typescript-eslint strictTypeChecked ($cfg)"
+fi
+if [ -f tsconfig.json ]; then
+  grep -qE '"strict":\s*true' tsconfig.json || fail "tsconfig.json does not set strict: true"
+  grep -qE '"noUncheckedIndexedAccess":\s*true' tsconfig.json || warn "tsconfig.json does not set noUncheckedIndexedAccess"
 fi
 
 echo "== Review"
@@ -142,6 +153,17 @@ else
     echo "$classic" | tr -d ' \n' | grep -q '"enforce_admins":{[^}]*"enabled":true' || fail "Admins can bypass protection on $branch"
   else
     fail "Anyone with write access can push to $branch unreviewed (no ruleset or protection found)"
+  fi
+
+  echo "== Merge settings (GitHub)"
+  merge=$(gh api "repos/$repo" --jq '"\(.allow_squash_merge) \(.allow_merge_commit) \(.allow_rebase_merge) \(.allow_auto_merge) \(.delete_branch_on_merge)"')
+  read -r squash mcommit rebase auto delbranch <<<"$merge"
+  if [ "$squash" = null ]; then
+    skip "Merge settings not readable without push access"
+  else
+    [ "$squash $mcommit $rebase" = "true false false" ] && pass "Squash merging only" || warn "Allow squash merging only (merge commit and rebase off)"
+    [ "$auto" = true ] && pass "Auto-merge allowed" || warn "Auto-merge not allowed"
+    [ "$delbranch" = true ] && pass "Head branches deleted after merge" || warn "Head branches not deleted after merge"
   fi
 fi
 
