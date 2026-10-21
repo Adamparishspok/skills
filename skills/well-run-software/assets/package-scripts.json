@@ -1,13 +1,15 @@
 {
-  "//": "Merge into package.json. Then: npm i -D husky lint-staged prettier eslint @commitlint/cli @commitlint/config-conventional && npx husky init",
+  "//": "Merge into package.json. Then: npm i -D husky lint-staged prettier eslint @eslint/js typescript-eslint eslint-config-prettier typescript vitest @commitlint/cli @commitlint/config-conventional && npx husky init",
   "scripts": {
     "prepare": "husky",
     "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs,svelte,vue}": ["prettier --write", "eslint --fix --max-warnings=0"],
+    "*.{js,jsx,ts,tsx,mjs,cjs,svelte,vue}": ["eslint --fix --max-warnings=0", "prettier --write"],
     "*.{json,md,css,scss,html,yml,yaml}": "prettier --write"
   }
 }

@@ -43,10 +43,10 @@ The one idea behind all of it: **make the right thing the easy thing, and the wr
 
 **Pre-commit hooks** catch problems in seconds instead of minutes later in CI:
 - Block commits on `main`/`master` locally, so nobody has to remember to branch.
-- Format and lint only the staged files, so the hook stays fast.
+- Auto-fix and format only the staged files (`eslint --fix`, then `prettier --write`), so the hook stays fast and fixes what it can instead of only failing.
 - Check the commit message format.
 
-Node: husky + lint-staged (`assets/husky/`, `assets/package-scripts.json`). Any language: lefthook or the `pre-commit` framework. Hooks are a convenience: anyone can skip them with `--no-verify`. CI and the ruleset are the real gate, so every hook check must also run in CI.
+Vite+: `.vite-hooks/pre-commit` running `vp staged` (`assets/vite-hooks/`). Other Node setups: husky + lint-staged (`assets/husky/`, `assets/package-scripts.json`). Any language: lefthook or the `pre-commit` framework. Hooks are a convenience: anyone can skip them with `--no-verify`. CI and the ruleset are the real gate, so every hook check must also run in CI.
 
 ---
 
@@ -68,6 +68,16 @@ Node: husky + lint-staged (`assets/husky/`, `assets/package-scripts.json`). Any 
 - **Leave the bypass list empty.** This is the ruleset version of "include administrators".
 
 With classic branch protection, the same list applies, and "Do not allow bypassing the above settings" (formerly "Include administrators") must be on.
+
+**Merge settings** (Settings → General → Pull Requests). These are repo-wide, not part of the ruleset:
+- Allow squash merging only. Turn off merge commits and rebase merging, so `main` gets one commit per PR, titled from the PR.
+- Allow auto-merge, so a PR merges itself once approvals and required checks pass.
+- Automatically delete head branches, so merged branches don't pile up.
+
+```bash
+gh repo edit {owner}/{repo} --enable-squash-merge --enable-merge-commit=false --enable-rebase-merge=false \
+  --enable-auto-merge --delete-branch-on-merge
+```
 
 To check from the command line:
 ```bash
@@ -100,9 +110,10 @@ gh api repos/{owner}/{repo}/branches/main/protection  # classic protection, 404 
 
 Formatting is not a review topic. A machine decides, and humans never argue about it again.
 
-- **One formatter, zero options debated.** Prettier for web stacks, or Biome for one fast tool that formats and lints. Ruff format for Python, `gofmt` for Go, `rustfmt` for Rust. Accept the defaults.
+- **One formatter, zero options debated.** For JS/TS, Vite+ (`vp fmt` and `vp check`, built on Oxfmt and Oxlint) is one fast tool that formats, lints and type-checks. Use Prettier + ESLint only when you need ESLint-only plugins. Biome is another one-tool option. Ruff format for Python, `gofmt` for Go, `rustfmt` for Rust. Accept the defaults.
 - Add an `.editorconfig` (`assets/editorconfig.ini`) so every editor agrees on line endings, final newline and indentation before the formatter runs.
-- **Lint strict, as errors.** Warnings pile up and get ignored. Run the linter with zero warnings allowed (`--max-warnings=0`). For TypeScript use `typescript-eslint` `strict` (not just `recommended`), and make `no-explicit-any` and `no-unused-vars` errors. See `assets/eslint.config.js`, or `assets/biome.json` for Biome.
+- **Lint strict, as errors.** Warnings pile up and get ignored. Run the linter with zero warnings allowed (`--max-warnings=0`). For TypeScript use `typescript-eslint` `strictTypeChecked` plus `stylisticTypeChecked` (not just `recommended`). The type-aware rules catch real bugs that syntax rules miss: promises nobody awaits, `switch` statements that skip a case, conditions that are always true. On Vite+, turn on `typeAware` and `typeCheck` and set the `correctness`, `suspicious` and `perf` categories to `error` (`assets/vite-plus.config.ts`). See `assets/eslint.config.js` for ESLint, or `assets/biome.json` for Biome.
+- **Typecheck at full strictness.** `strict` alone is not enough. Turn on `noUncheckedIndexedAccess`, so `arr[0]` can be `undefined`, and `exactOptionalPropertyTypes`, plus the rest of `assets/tsconfig.json`. Run `tsc --noEmit` in CI as its own step.
 - Keep the formatter and linter from fighting: `eslint-config-prettier` turns off ESLint's style rules, and Prettier owns formatting.
 - **Relax a rule only where it is wrong, by file pattern, with a comment saying why.** For example, non-null assertions in test files, or in Svelte/Vue templates where type narrowing from a template condition does not carry into the expression below it. Never turn a rule off for the whole project to silence one file.
 - **Ignore code you do not maintain** (generated output, vendored or copied-in components) instead of letting it block lint.
@@ -303,6 +314,7 @@ Work top to bottom. The first block is an afternoon's work.
 - [ ] Commitlint and ticket-link workflows on PRs, as required checks
 - [ ] Actions pinned to commit SHAs, `permissions: contents: read` at the top
 - [ ] Ruleset on `main` with empty bypass list, CI jobs as required checks
+- [ ] Squash merging only, auto-merge on, head branches deleted after merge
 - [ ] PR template and `CODEOWNERS`
 - [ ] Dependabot (or Renovate) with cooldown, including `github-actions`
 - [ ] 2FA on every account

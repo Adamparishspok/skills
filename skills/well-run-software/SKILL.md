@@ -43,6 +43,21 @@ Do not change anything in Audit mode unless the user asks.
 
 Work through the **Day one** checklist in `references/playbook.md`. Copy templates from `assets/` and fill them in for the stack you find (language, package manager, scripts). The templates use GitHub. On GitLab, Bitbucket or another host, apply the same controls with that host's equivalents.
 
+### Pick the toolchain
+
+Use the best tool for the stack, and keep one tool per job.
+
+| Stack | Format + lint + typecheck | Hooks |
+|---|---|---|
+| JS/TS web app or library (Vite, React, Vue, Svelte, TanStack, Node services) | **Vite+** (`vp check`: Oxfmt + type-aware Oxlint + type check). The default. | `.vite-hooks/pre-commit` + `staged` block |
+| Next.js, Astro and other non-Vite frameworks | Vite+ for format, lint and test (`vp check`, `vp test`). The framework keeps its own build. | Vite+ |
+| Needs ESLint-only plugins Oxlint cannot load (`eslint-config-expo`, `eslint-plugin-react-native`, custom ESLint plugins) | ESLint `strictTypeChecked` + Prettier | husky + lint-staged |
+| Python / Go / Rust | Ruff / `gofmt` + golangci-lint / `rustfmt` + clippy | lefthook or `pre-commit` |
+
+On an existing ESLint or Prettier project, `vp migrate --no-interactive` moves config into `vite.config.ts`. Review the result: most projects need manual adjustments. Oxlint loads many ESLint plugins as `jsPlugins`. Check this before you rule Vite+ out.
+
+**Global `core.hooksPath` disables project hooks.** If `git config --global core.hooksPath` is set, `vp config` refuses to install hooks, and every Vite+ hook in every repo is silently dead. Check it, and show the user before you unset it.
+
 | File | Goes to |
 |---|---|
 | `assets/pull_request_template.md` | `.github/pull_request_template.md` |
@@ -51,9 +66,13 @@ Work through the **Day one** checklist in `references/playbook.md`. Copy templat
 | `assets/commitlint.yml` + `assets/commitlint.config.js` | `.github/workflows/commitlint.yml` + `commitlint.config.js` |
 | `assets/ticket-link.yml` | `.github/workflows/ticket-link.yml` (set `TICKET_PATTERN` for the tracker) |
 | `assets/editorconfig.ini` | `.editorconfig` |
-| `assets/eslint.config.js` | `eslint.config.js` (TypeScript projects; or `assets/biome.json` as `biome.json` to replace Prettier + ESLint) |
-| `assets/package-scripts.json` | merge into `package.json` (scripts + lint-staged), then `npx husky init` |
-| `assets/husky/pre-commit.sh`, `assets/husky/commit-msg.sh` | `.husky/pre-commit` and `.husky/commit-msg`, no extension (Node; use lefthook or `pre-commit` for other stacks) |
+| `assets/vite-plus.config.ts` | merge the `lint`, `fmt` and `staged` blocks into `vite.config.ts` (Vite+). Add `vp config` as the `prepare` script |
+| `assets/vite-hooks/pre-commit.sh` | `.vite-hooks/pre-commit`, no extension (Vite+) |
+| `assets/ci-vite-plus.yml` | `.github/workflows/ci.yml` (Vite+; add the `audit`, `semgrep` and `workflows` jobs from `ci.yml`) |
+| `assets/eslint.config.js` | `eslint.config.js` (ESLint path only; or `assets/biome.json` as `biome.json` to replace Prettier + ESLint) |
+| `assets/tsconfig.json` | merge its `compilerOptions` into `tsconfig.json`. Keep the framework's own `target`, `module`, `jsx` and `paths`. Drop `verbatimModuleSyntax` on TanStack Start: it keeps type-only imports of `.server` modules in client code and breaks the build |
+| `assets/package-scripts.json` | merge into `package.json` (scripts + lint-staged), then `npx husky init` (ESLint path) |
+| `assets/husky/pre-commit.sh`, `assets/husky/commit-msg.sh` | `.husky/pre-commit` and `.husky/commit-msg`, no extension (ESLint path; use lefthook or `pre-commit` for other stacks) |
 | `assets/dependabot.yml` | `.github/dependabot.yml` |
 | `assets/dast.yml` | `.github/workflows/dast.yml` (only for a deployed web app or API) |
 
@@ -66,10 +85,12 @@ Work through the **Day one** checklist in `references/playbook.md`. Copy templat
   ```
   Write it as `uses: actions/checkout@<sha> # v4.2.2`. If `gh` is unavailable, leave the placeholder and tell the user. Tools like `pinact` or `ratchet` can pin a whole workflow.
 - Replace every `<...>` placeholder in `ci.yml` with the project's real commands. If a step has no tool yet (no typechecker, say), add one or drop the step. Say which.
-- **Branch protection and rulesets change shared settings.** Show the user the exact `gh api` call or settings list and get a yes before you apply it. Prefer a repository **ruleset** over classic branch protection. See `references/playbook.md` section 2.
+- **Branch protection, rulesets and merge settings change shared settings.** Show the user the exact `gh api` or `gh repo edit` call or settings list and get a yes before you apply it. Prefer a repository **ruleset** over classic branch protection. See `references/playbook.md` section 2.
 - Never commit a real secret, even to test. Use `.env.example` with placeholders.
-- Add a test only if a test runner already exists or the user agrees to one.
-- Stricter lint or a new formatter on an existing codebase: land the config plus auto-fix output (`prettier --write .`, `eslint --fix`) in its own PR, with no logic changes. Hand-fix what remains properly (throw on a missing value instead of `!`, real types instead of `any`). Relax a rule only by file pattern with a comment, and ignore vendored code rather than fixing it.
+- Add a test only if a test runner already exists or the user agrees to one. Default to Vitest, with `--passWithNoTests` until the first real test lands.
+- Use a test runner the framework already ships with (Jest in a create-react-app, `node --test`) instead of adding Vitest beside it.
+- On the ESLint path, Prettier needs a plugin for some file types (`prettier-plugin-svelte`, `prettier-plugin-astro`). Add it, or Prettier skips those files.
+- Stricter lint or a new formatter on an existing codebase: land the config plus auto-fix output (`vp check --fix`, or `prettier --write .` + `eslint --fix`) in its own PR, with no logic changes. Hand-fix what remains properly (throw on a missing value instead of `!`, real types instead of `any`). Relax a rule only by file pattern with a comment, and ignore vendored code rather than fixing it. Too many errors for one PR? Set only `exactOptionalPropertyTypes` (tsconfig) or one noisy rule to off in that PR, and open a ticket to turn it back on.
 - Every hook check must also run in CI. Hooks can be skipped with `--no-verify`.
 
 ## Scale to the team

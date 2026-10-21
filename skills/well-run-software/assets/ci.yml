@@ -4,6 +4,7 @@
 #   setup:  actions/setup-node | setup-python | setup-go | setup-java | dtolnay/rust-toolchain
 #   install from lockfile:  npm ci | uv sync --locked | go mod download | cargo fetch --locked
 #   format check:           npm run format:check (prettier --check .) | ruff format --check | test -z "$(gofmt -l .)" | cargo fmt --check
+#   lint / typecheck / test (Node, scripts from package-scripts.json):  npm run lint | npm run typecheck | npm test
 #   dependency audit:       npm audit --audit-level=high | pip-audit | govulncheck ./... | cargo audit
 # Drop a step only if the tool truly does not apply.
 name: CI
